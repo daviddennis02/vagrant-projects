@@ -2,6 +2,19 @@ $script = <<-SCRIPT
 sudo apt update -y && sudo apt upgrade -y
 sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
 sudo systemctl restart sshd
+# sudo apt-get update
+    
+# Install Ubuntu Desktop and LightDM display manager
+sudo apt-get install -y ubuntu-desktop lightdm
+
+# Install VirtualBox Guest Additions (optional, but recommended for better integration)
+sudo apt-get install -y virtualbox-guest-utils virtualbox-guest-x11
+
+# Disable Wayland display manager (if present)
+sudo sed -i 's/#WaylandEnable=false/WaylandEnable=false/g' /etc/gdm3/custom.conf
+
+# Start the display manager
+sudo systemctl start lightdm
 sudo reboot
 SCRIPT
 
@@ -10,7 +23,7 @@ Vagrant.configure("2") do |config|
     num_vms = 4
 
     # Define a base IP Address
-    base_ip = "192.168.33."
+    base_ip = "192.168.56."
 
     # Loop to define VMs
     (1..num_vms).each do |i|
@@ -25,6 +38,8 @@ Vagrant.configure("2") do |config|
             vm.vm.provider "virtualbox" do |v|
                 # customize virtual machine settings if needed
                 v.memory = 2046
+                v.gui = true
+                v.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
                 # v.cpu = 2
             end
         end
