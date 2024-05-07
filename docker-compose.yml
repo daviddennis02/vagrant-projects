@@ -1,0 +1,26 @@
+---
+version: "3.7"
+services:
+  chef-workstation:
+    image: ubuntu:20.04
+    stdin_open: true
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+      - "80:80"
+    command: bash -xc "
+      apt-get update && 
+      apt-get install -y curl wget git &&
+      curl -o /tmp/code-server.sh https://raw.githubusercontent.com/coder/code-server/main/install.sh  &&
+      chmod u+x /tmp/code-server.sh && 
+      bash /tmp/code-server.sh  > /dev/null 2>&1 && 
+      wget https://packages.chef.io/files/stable/chef-workstation/21.10.640/ubuntu/20.04/chef-workstation_21.10.640-1_amd64.deb && 
+      dpkg -i chef-workstation_21.10.640-1_amd64.deb && 
+      mkdir -p /root/cookbooks &&
+      cd /root/cookbooks &&
+      git config --global user.email 'dennis.david02@gmail.com' &&
+      git config --global user.name 'daviddennis02' &&
+      code-server --bind-addr 0.0.0.0:8000 --auth none
+      "
+
+
